@@ -44,6 +44,7 @@ public class PeripheralDevice implements Serializable {
 
     @Column(name = "IS_ONLINE",
             nullable = false)
+    @Expose
     private boolean online;
 
     @ManyToOne
