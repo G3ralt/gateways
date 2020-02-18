@@ -7,14 +7,7 @@ import facades.GatewayFacade;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.NoResultException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Produces;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import static rest.JSONConverter.getJSONfromObject;
@@ -60,7 +53,6 @@ public class GatewayResource {
             @DefaultValue("undefined") @QueryParam("deviceId") String deviceId,
             String jsonRequest) {
 
-        System.out.println(jsonRequest);
         Gateway gw = null;
         try {
             gw = GATEWAY_FACADE.getGatewayById(Long.parseLong(gatewayId));
@@ -91,7 +83,42 @@ public class GatewayResource {
             ex.printStackTrace();
             return Response.status(Response.Status.FORBIDDEN).entity("Gateway capacity(10) reached!").build();
         }
-        System.out.println(gw);
+
+        return Response.ok().entity(getJSONfromObject(gw)).build();
+    }
+
+    @PUT
+    @Path("{gatewayId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeDeviceFromGateway(@PathParam("gatewayId") String gatewayId,
+            @DefaultValue("undefined") @QueryParam("deviceId") String deviceId) {
+
+        Gateway gw = null;
+        try {
+            gw = GATEWAY_FACADE.getGatewayById(Long.parseLong(gatewayId));
+        } catch (NoResultException nre) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("No gateway with id: " + gatewayId).build();
+        }
+        PeripheralDevice device = null;
+        if (deviceId.equals("undefined")) {
+
+            return Response.status(Response.Status.BAD_REQUEST).entity("Query param deviceId missing!").build();
+
+        } else {
+
+            try {
+                device = FacadeFactory.getPeripheralDeviceFacade().getGatewayById(Long.parseLong(deviceId));
+            } catch (NoResultException nre) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("No peripheral device with id: " + deviceId).build();
+            }
+
+        }
+
+        if (!gw.removeDevice(device)) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Device not part of gateway!").build();
+        }
+        
+        GATEWAY_FACADE.updateGateway(gw);
         return Response.ok().entity(getJSONfromObject(gw)).build();
     }
 

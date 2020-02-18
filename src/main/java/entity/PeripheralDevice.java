@@ -33,6 +33,7 @@ public class PeripheralDevice implements Serializable {
     @Column(name = "VENDOR",
             nullable = false,
             length = 255)
+    @Expose
     private String vendor;
 
     @Column(name = "DATE_CREATED",
