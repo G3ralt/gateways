@@ -90,8 +90,9 @@ public class Gateway implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Gateway[ id=" + id + " ]";
+        return "Gateway{" + "id=" + id + ", serialNumber=" + serialNumber + ", name=" + name + ", ipAddress=" + ipAddress + ", associatedDevices=" + associatedDevices + '}';
     }
+
 
     public Long getId() {
         return id;

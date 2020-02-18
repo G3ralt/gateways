@@ -37,4 +37,12 @@ public class GatewayFacade {
         q.setParameter(1, id);
         return (Gateway) q.getSingleResult();
     }
+
+    public Gateway updateGateway(Gateway gw) {
+        EM.getTransaction().begin();
+        EM.merge(gw);
+        EM.flush();
+        EM.getTransaction().commit();
+        return gw;
+    }
 }
